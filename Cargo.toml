@@ -15,6 +15,7 @@ travis-ci = { repository = "dsprenkels/saber-rust" }
 maintenance = { status = "as-is" }
 
 [dependencies]
+blake3 = "1.2.0"
 rand_os = "0.1"
 secret_integers = "0.1.3"
 

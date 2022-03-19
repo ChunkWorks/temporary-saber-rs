@@ -248,6 +248,17 @@ macro_rules! __generate_non_generic_impl {
         pub fn keygen() -> SecretKey {
             generic::keygen::<$struct>()
         }
+        /// Generate a saber keypair with seed.
+        ///
+        /// # Example
+        ///
+        /// ```
+        /// let seed = vec![1, 2, 3, 4];
+        /// let secret_key = saber::saber::keygen_seed(&seed);
+        /// ```
+        pub fn keygen_seed(main_seed: &[u8]) -> SecretKey {
+            generic::keygen_seed::<$struct>(main_seed)
+        }
 
         /// Encapsulate a secret destined for `pk_cca`.
         ///

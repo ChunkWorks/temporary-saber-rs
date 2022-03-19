@@ -524,6 +524,36 @@ pub(crate) fn keygen<I: SaberImpl>() -> I::SecretKey {
     I::SecretKey::new(z, hash_pk, I::PublicKey::new(pk_cpa), sk_cpa)
 }
 
+/// This function implements Saber.KEM.KeyGen, as described in Algorithm 26
+pub(crate) fn keygen_seed<I: SaberImpl>(main_seed: &[u8]) -> I::SecretKey {
+    let mut seed = [0; SEEDBYTES];
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(&[0]);
+    hasher.update(main_seed);
+    let mut output_reader = hasher.finalize_xof();
+    output_reader.fill(&mut seed);
+    
+    let mut noiseseed = [0; COINBYTES];
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(&[1]);
+    hasher.update(main_seed);
+    let mut output_reader = hasher.finalize_xof();
+    output_reader.fill(&mut noiseseed);
+
+    let (pk_cpa, sk_cpa) = indcpa_kem_keypair_deterministic::<I>(seed, noiseseed);
+    let mut hash_pk = [0; HASHBYTES];
+    let pk_cpa_bytes = pk_cpa.to_bytes();
+    let hash_digest = Sha3_256::digest(pk_cpa_bytes.as_ref());
+    hash_pk.copy_from_slice(hash_digest.as_slice());
+    let mut z = [0; KEYBYTES];
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(&[2]);
+    hasher.update(main_seed);
+    let mut output_reader = hasher.finalize_xof();
+    output_reader.fill(&mut z);
+    I::SecretKey::new(z, hash_pk, I::PublicKey::new(pk_cpa), sk_cpa)
+}
+
 /// This function implements Saber.KEM.Encaps, as described in Algorithm 27
 pub(crate) fn encapsulate<I: SaberImpl>(pk_cca: &I::PublicKey) -> (SharedSecret, I::Ciphertext) {
     let mut m = [0; KEYBYTES];
