@@ -532,7 +532,7 @@ pub(crate) fn keygen_seed<I: SaberImpl>(main_seed: &[u8]) -> I::SecretKey {
     hasher.update(main_seed);
     let mut output_reader = hasher.finalize_xof();
     output_reader.fill(&mut seed);
-    
+
     let mut noiseseed = [0; COINBYTES];
     let mut hasher = blake3::Hasher::new();
     hasher.update(&[1]);
