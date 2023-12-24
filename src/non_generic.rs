@@ -330,7 +330,7 @@ macro_rules! __generate_non_generic_tests {
 
                 let (pk, sk) = generic::indcpa_kem_keypair::<$struct>();
                 for _ in 0..100 {
-                    let mut rng = rand_os::OsRng::new().unwrap();
+                    let mut rng = rand::thread_rng();
                     let mut noiseseed = [0; NOISE_SEEDBYTES];
                     rng.fill_bytes(&mut noiseseed);
                     let mut message_received = [0; KEYBYTES];
